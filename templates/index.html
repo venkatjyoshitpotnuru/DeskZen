@@ -1,0 +1,706 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>DeskZen — Smart Desk Cleanup Assistant</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg-dark: #07090e;
+      --card-bg: rgba(17, 24, 39, 0.65);
+      --card-border: rgba(255, 255, 255, 0.08);
+      --card-border-hover: rgba(56, 189, 248, 0.35);
+      --accent-cyan: #38bdf8;
+      --accent-indigo: #6366f1;
+      --accent-emerald: #10b981;
+      --accent-rose: #f43f5e;
+      --accent-amber: #f59e0b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-sub: #64748b;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-dark);
+      background-image: 
+        radial-gradient(at 0% 0%, rgba(99, 102, 241, 0.12) 0px, transparent 50%),
+        radial-gradient(at 100% 100%, rgba(56, 189, 248, 0.08) 0px, transparent 50%);
+      color: var(--text-main);
+      font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
+      padding: 2.5rem 1.25rem;
+      min-height: 100vh;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .container {
+      max-width: 1180px;
+      margin: 0 auto;
+    }
+
+    /* Top Navigation Bar */
+    .nav-bar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 2rem;
+      padding-bottom: 1.25rem;
+      border-bottom: 1px solid var(--card-border);
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .brand-logo {
+      width: 36px;
+      height: 36px;
+      background: linear-gradient(135deg, var(--accent-cyan), var(--accent-indigo));
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-weight: 800;
+      color: #fff;
+      font-size: 1.1rem;
+      box-shadow: 0 0 20px rgba(56, 189, 248, 0.35);
+    }
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+    .badge {
+      font-size: 0.75rem;
+      font-weight: 600;
+      padding: 0.35rem 0.75rem;
+      border-radius: 9999px;
+      background: rgba(56, 189, 248, 0.1);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+    }
+
+    /* Header Section */
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    header h1 {
+      font-size: 2.5rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      background: linear-gradient(180deg, #ffffff 30%, #94a3b8 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 0.6rem;
+    }
+    header p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+      max-width: 580px;
+      margin: 0 auto;
+      line-height: 1.5;
+    }
+
+    /* Layout Grid */
+    .main-grid {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 1.75rem;
+    }
+    @media (min-width: 900px) {
+      .main-grid {
+        grid-template-columns: 1fr 1.25fr;
+      }
+    }
+
+    .card {
+      background: var(--card-bg);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid var(--card-border);
+      border-radius: 16px;
+      padding: 1.75rem;
+      box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.5);
+      transition: border-color 0.25s;
+    }
+
+    .card-head {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1.25rem;
+    }
+    .card-head h2 {
+      font-size: 1.05rem;
+      font-weight: 700;
+      letter-spacing: -0.01em;
+      color: var(--text-main);
+    }
+
+    /* Upload Zone */
+    .upload-zone {
+      border: 2px dashed rgba(255, 255, 255, 0.12);
+      border-radius: 12px;
+      padding: 2.75rem 1.5rem;
+      text-align: center;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+      background: rgba(255, 255, 255, 0.02);
+    }
+    .upload-zone:hover {
+      border-color: var(--accent-cyan);
+      background: rgba(56, 189, 248, 0.04);
+      transform: translateY(-2px);
+    }
+    .upload-icon {
+      width: 48px;
+      height: 48px;
+      margin: 0 auto 1rem;
+      background: rgba(255, 255, 255, 0.05);
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+    }
+
+    /* Buttons */
+    .btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      width: 100%;
+      padding: 0.95rem;
+      margin-top: 1.25rem;
+      background: linear-gradient(135deg, var(--accent-cyan), #0284c7);
+      color: #fff;
+      font-weight: 700;
+      font-size: 0.95rem;
+      font-family: inherit;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      box-shadow: 0 4px 20px rgba(56, 189, 248, 0.25);
+      transition: all 0.2s;
+    }
+    .btn:hover {
+      transform: translateY(-1px);
+      box-shadow: 0 6px 24px rgba(56, 189, 248, 0.35);
+    }
+    .btn:disabled {
+      background: #334155;
+      box-shadow: none;
+      cursor: not-allowed;
+      transform: none;
+    }
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.06);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      box-shadow: none;
+      margin-top: 0.75rem;
+    }
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.1);
+      box-shadow: none;
+    }
+
+    /* Stats Dashboard */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0.85rem;
+      margin-bottom: 1.5rem;
+    }
+    .stat-box {
+      background: rgba(255, 255, 255, 0.03);
+      padding: 1.15rem 0.75rem;
+      border-radius: 12px;
+      border: 1px solid var(--card-border);
+      text-align: center;
+    }
+    .stat-val {
+      font-size: 2rem;
+      font-weight: 800;
+      letter-spacing: -0.03em;
+      line-height: 1.1;
+    }
+    .stat-label {
+      font-size: 0.8rem;
+      color: var(--text-muted);
+      font-weight: 500;
+      margin-top: 0.35rem;
+    }
+
+    /* Delta Badge Banner */
+    .delta-badge {
+      background: rgba(16, 185, 129, 0.08);
+      border: 1px solid rgba(16, 185, 129, 0.25);
+      padding: 1rem;
+      border-radius: 12px;
+      margin-bottom: 1.25rem;
+      display: flex;
+      justify-content: space-around;
+      align-items: center;
+      text-align: center;
+    }
+    .delta-val {
+      font-size: 1.25rem;
+      font-weight: 800;
+      color: var(--accent-emerald);
+    }
+
+    /* Visual Tabs Switcher */
+    .toggle-container {
+      display: flex;
+      background: rgba(0, 0, 0, 0.4);
+      padding: 4px;
+      border-radius: 10px;
+      margin-top: 1rem;
+      gap: 4px;
+      border: 1px solid var(--card-border);
+    }
+    .toggle-btn {
+      flex: 1;
+      padding: 0.55rem;
+      font-size: 0.82rem;
+      font-weight: 600;
+      font-family: inherit;
+      border: none;
+      border-radius: 8px;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .toggle-btn.active {
+      background: rgba(255, 255, 255, 0.1);
+      color: var(--text-main);
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
+    }
+
+    .view-image {
+      width: 100%;
+      border-radius: 12px;
+      margin-top: 0.85rem;
+      border: 1px solid var(--card-border);
+      aspect-ratio: 16 / 10;
+      object-fit: cover;
+    }
+
+    /* Interactive Slider Component */
+    .slider-wrapper {
+      position: relative;
+      width: 100%;
+      aspect-ratio: 16 / 10;
+      margin-top: 0.85rem;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--card-border);
+      user-select: none;
+    }
+    .slider-img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      pointer-events: none;
+    }
+    .slider-overlay {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 50%;
+      height: 100%;
+      overflow: hidden;
+    }
+    .slider-overlay img {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+    }
+    .slider-handle {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #ffffff;
+      box-shadow: 0 0 12px rgba(255, 255, 255, 0.8);
+      cursor: ew-resize;
+    }
+    .slider-handle::after {
+      content: "↔";
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      width: 28px;
+      height: 28px;
+      background: #0f172a;
+      border: 2px solid #ffffff;
+      color: #ffffff;
+      font-size: 0.75rem;
+      font-weight: 800;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.5);
+    }
+    .slider-pill {
+      position: absolute;
+      top: 12px;
+      padding: 4px 10px;
+      border-radius: 9999px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+      z-index: 2;
+      backdrop-filter: blur(8px);
+    }
+    .pill-before { left: 12px; background: rgba(244, 63, 94, 0.2); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.4); }
+    .pill-after { right: 12px; background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }
+
+    /* Action Items */
+    .action-item {
+      background: rgba(255, 255, 255, 0.02);
+      border: 1px solid var(--card-border);
+      padding: 1rem 1.15rem;
+      border-radius: 12px;
+      margin-bottom: 0.75rem;
+      border-left: 4px solid var(--accent-cyan);
+      transition: transform 0.15s, background 0.15s;
+    }
+    .action-item:hover {
+      background: rgba(255, 255, 255, 0.04);
+      transform: translateX(3px);
+    }
+    .action-item.High { border-left-color: var(--accent-rose); }
+    .action-item.Medium { border-left-color: var(--accent-amber); }
+    .action-item.Low { border-left-color: var(--accent-emerald); }
+    .action-title { font-weight: 700; font-size: 0.92rem; margin-bottom: 0.25rem; }
+    .action-desc { font-size: 0.84rem; color: var(--text-muted); line-height: 1.5; }
+
+    /* Loading state */
+    #loadingSpinner {
+      display: none;
+      text-align: center;
+      padding: 2rem;
+      color: var(--accent-cyan);
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+    .pulse-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      background: var(--accent-cyan);
+      margin-right: 6px;
+      animation: pulse 1.5s infinite ease-in-out;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 0.3; transform: scale(0.9); }
+      50% { opacity: 1; transform: scale(1.15); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    
+    <!-- Top Navigation -->
+    <nav class="nav-bar">
+      <div class="brand">
+        <div class="brand-logo">✨</div>
+        <div class="brand-title">DeskZen</div>
+      </div>
+      <div class="badge">AI Desk Assistant</div>
+    </nav>
+
+    <!-- Header Section -->
+    <header>
+      <h1>Clean Desk, Clear Mind</h1>
+      <p>Upload a photo of your desk to check clutter levels, track open space, and get tips to stay organized.</p>
+    </header>
+
+    <div class="main-grid">
+      <!-- Input Panel -->
+      <div class="card">
+        <div class="card-head">
+          <h2 id="inputHeading">1. Upload Desk Photo</h2>
+          <span style="font-size: 0.8rem; color: var(--text-sub);">Ready</span>
+        </div>
+
+        <div class="upload-zone" onclick="document.getElementById('imageInput').click()">
+          <div class="upload-icon">📸</div>
+          <p id="uploadTitle" style="font-size: 1.05rem; font-weight: 700; margin-bottom: 0.3rem;">Choose a Photo</p>
+          <p id="uploadSub" style="font-size: 0.85rem; color: var(--text-muted);">Click here or drag an image of your desk</p>
+          <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="previewFile()" />
+        </div>
+
+        <img id="originalPreview" style="display: none; width: 100%; border-radius: 12px; margin-top: 1.25rem; max-height: 280px; object-fit: cover; border: 1px solid var(--card-border);" />
+
+        <button id="analyzeBtn" class="btn" style="display: none;" onclick="runAnalysis()">
+          <span>Scan Desk</span>
+        </button>
+
+        <button id="verifyBtn" class="btn btn-secondary" style="display: none;" onclick="prepareVerify()">
+          <span>✨ Check After Cleaning (Upload "After" Photo)</span>
+        </button>
+
+        <div id="loadingSpinner">
+          <span class="pulse-dot"></span>Analyzing clutter and desk space...
+        </div>
+      </div>
+
+      <!-- Results Panel -->
+      <div id="resultsCard" class="card" style="display: none;">
+        <div class="card-head">
+          <h2>2. Desk Score & Results</h2>
+          <span style="font-size: 0.8rem; color: var(--text-muted);">Live Analysis</span>
+        </div>
+        
+        <!-- Score Delta Badge -->
+        <div id="deltaBadge" class="delta-badge" style="display: none;">
+          <div>
+            <div id="scoreDelta" class="delta-val">+0 pts</div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Score Gain</div>
+          </div>
+          <div style="border-left: 1px solid rgba(255, 255, 255, 0.1); height: 28px;"></div>
+          <div>
+            <div id="clearedDelta" class="delta-val" style="color: var(--accent-cyan);">0</div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Items Removed</div>
+          </div>
+          <div style="border-left: 1px solid rgba(255, 255, 255, 0.1); height: 28px;"></div>
+          <div>
+            <div id="surfaceDelta" class="delta-val" style="color: #a78bfa;">+0%</div>
+            <div style="font-size: 0.72rem; color: var(--text-muted); text-transform: uppercase;">Free Space Gained</div>
+          </div>
+        </div>
+
+        <!-- Metric Boxes -->
+        <div class="stats-row">
+          <div class="stat-box">
+            <div id="zenScore" class="stat-val">--</div>
+            <div class="stat-label">Cleanliness Score</div>
+          </div>
+          <div class="stat-box">
+            <div id="itemCount" class="stat-val" style="color: var(--accent-cyan);">--</div>
+            <div class="stat-label">Items on Desk</div>
+          </div>
+          <div class="stat-box">
+            <div id="freeSpace" class="stat-val" style="color: #a78bfa;">--</div>
+            <div class="stat-label">Free Surface Space</div>
+          </div>
+        </div>
+
+        <!-- Mode Toggles -->
+        <div class="toggle-container">
+          <button id="tabHeatmap" class="toggle-btn active" onclick="switchView('heatmap')">🔥 Clutter Heatmap</button>
+          <button id="tabBoxes" class="toggle-btn" onclick="switchView('boxes')">🎯 Detected Items</button>
+          <button id="tabSlider" class="toggle-btn" style="display: none;" onclick="switchView('slider')">↔️ Before vs After</button>
+        </div>
+
+        <!-- Single View Image -->
+        <img id="displayViewImg" class="view-image" />
+
+        <!-- Before vs After Interactive Wipe Slider -->
+        <div id="sliderContainer" class="slider-wrapper" style="display: none;">
+          <div class="slider-pill pill-before">Before</div>
+          <div class="slider-pill pill-after">After</div>
+          <img id="sliderAfterImg" class="slider-img" alt="After Cleaning" />
+          <div id="sliderOverlay" class="slider-overlay">
+            <img id="sliderBeforeImg" alt="Before Cleaning" />
+          </div>
+          <div id="sliderHandle" class="slider-handle" style="left: 50%;"></div>
+        </div>
+
+        <p id="viewCaption" style="font-size: 0.78rem; color: var(--text-muted); margin-top: 0.65rem; margin-bottom: 1.5rem; text-align: center;">
+          Red and warm spots show where clutter is building up. Cool blue areas show clean, open working space.
+        </p>
+
+        <!-- Action Items List -->
+        <h3 style="font-size: 0.92rem; font-weight: 700; margin-bottom: 0.85rem; color: var(--text-main);">Quick Things to Fix:</h3>
+        <div id="actionList"></div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let selectedFile = null;
+    let beforeData = null;
+    let afterData = null;
+    let isVerifyingMode = false;
+    let currentMode = "heatmap";
+
+    function previewFile() {
+      const input = document.getElementById("imageInput");
+      if (input.files && input.files[0]) {
+        selectedFile = input.files[0];
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          const preview = document.getElementById("originalPreview");
+          preview.src = e.target.result;
+          preview.style.display = "block";
+          document.getElementById("analyzeBtn").style.display = "flex";
+        };
+        reader.readAsDataURL(selectedFile);
+      }
+    }
+
+    function prepareVerify() {
+      isVerifyingMode = true;
+      selectedFile = null;
+      document.getElementById("imageInput").value = "";
+      document.getElementById("uploadTitle").innerText = "Upload Cleaned Desk Photo";
+      document.getElementById("uploadSub").innerText = "Select your 'After' photo to see your improvement";
+      document.getElementById("originalPreview").style.display = "none";
+      document.getElementById("analyzeBtn").innerText = "Compare Before & After";
+      document.getElementById("verifyBtn").style.display = "none";
+    }
+
+    function switchView(mode) {
+      currentMode = mode;
+      const img = document.getElementById("displayViewImg");
+      const slider = document.getElementById("sliderContainer");
+      const caption = document.getElementById("viewCaption");
+      const tabH = document.getElementById("tabHeatmap");
+      const tabB = document.getElementById("tabBoxes");
+      const tabS = document.getElementById("tabSlider");
+
+      tabH.className = "toggle-btn" + (mode === "heatmap" ? " active" : "");
+      tabB.className = "toggle-btn" + (mode === "boxes" ? " active" : "");
+      tabS.className = "toggle-btn" + (mode === "slider" ? " active" : "");
+
+      const activeData = afterData || beforeData;
+
+      if (mode === "heatmap") {
+        slider.style.display = "none";
+        img.style.display = "block";
+        img.src = activeData.heatmap;
+        caption.innerText = "Red and warm spots show where clutter is building up. Cool blue areas show clean, open working space.";
+      } else if (mode === "boxes") {
+        slider.style.display = "none";
+        img.style.display = "block";
+        img.src = activeData.detections_view;
+        caption.innerText = "Items detected by the AI model on your desk.";
+      } else if (mode === "slider") {
+        img.style.display = "none";
+        slider.style.display = "block";
+        document.getElementById("sliderBeforeImg").src = beforeData.heatmap;
+        document.getElementById("sliderAfterImg").src = afterData.heatmap;
+        initSlider();
+        caption.innerText = "Drag the center bar left and right to compare your desk before and after cleaning.";
+      }
+    }
+
+    async function runAnalysis() {
+      if (!selectedFile) return;
+
+      const btn = document.getElementById("analyzeBtn");
+      const spinner = document.getElementById("loadingSpinner");
+      btn.disabled = true;
+      spinner.style.display = "block";
+
+      const formData = new FormData();
+      formData.append("file", selectedFile);
+
+      try {
+        const response = await fetch("/analyze", { method: "POST", body: formData });
+        if (!response.ok) throw new Error("Analysis failed");
+        const data = await response.json();
+
+        if (!isVerifyingMode) {
+          beforeData = data;
+          renderMetrics(data);
+          switchView("heatmap");
+          document.getElementById("verifyBtn").style.display = "flex";
+        } else {
+          afterData = data;
+          renderMetrics(data);
+          renderDeltas(beforeData, afterData);
+          document.getElementById("tabSlider").style.display = "inline-block";
+          switchView("slider");
+        }
+
+        renderActions(data.action_items);
+        document.getElementById("resultsCard").style.display = "block";
+      } catch (err) {
+        alert("Something went wrong with the analysis. Please check your console.");
+        console.error(err);
+      } finally {
+        btn.disabled = false;
+        spinner.style.display = "none";
+      }
+    }
+
+    function renderMetrics(data) {
+      const scoreElem = document.getElementById("zenScore");
+      scoreElem.innerText = data.zen_score + "/100";
+      scoreElem.style.color = data.zen_score > 70 ? "#10b981" : data.zen_score > 45 ? "#f59e0b" : "#f43f5e";
+      document.getElementById("itemCount").innerText = data.total_objects;
+      document.getElementById("freeSpace").innerText = Math.round(data.free_surface_ratio * 100) + "%";
+    }
+
+    function renderDeltas(b, a) {
+      const scoreGain = a.zen_score - b.zen_score;
+      const surfaceGain = Math.round((a.free_surface_ratio - b.free_surface_ratio) * 100);
+      const estimatedCleared = Math.max(0, Math.round(surfaceGain / 6));
+
+      document.getElementById("scoreDelta").innerText = (scoreGain >= 0 ? "+" : "") + scoreGain + " pts";
+      document.getElementById("clearedDelta").innerText = estimatedCleared;
+      document.getElementById("surfaceDelta").innerText = (surfaceGain >= 0 ? "+" : "") + surfaceGain + "%";
+      document.getElementById("deltaBadge").style.display = "flex";
+    }
+
+    function renderActions(actions) {
+      const actionList = document.getElementById("actionList");
+      actionList.innerHTML = "";
+      actions.forEach(item => {
+        const div = document.createElement("div");
+        div.className = `action-item ${item.impact}`;
+        div.innerHTML = `
+          <div class="action-title">${item.priority}. ${item.title}</div>
+          <div class="action-desc">${item.desc}</div>
+        `;
+        actionList.appendChild(div);
+      });
+    }
+
+    function initSlider() {
+      const container = document.getElementById("sliderContainer");
+      const overlay = document.getElementById("sliderOverlay");
+      const handle = document.getElementById("sliderHandle");
+      let isDragging = false;
+
+      function updateSlider(x) {
+        const rect = container.getBoundingClientRect();
+        let pos = (x - rect.left) / rect.width;
+        pos = Math.max(0, Math.min(1, pos));
+        overlay.style.width = (pos * 100) + "%";
+        handle.style.left = (pos * 100) + "%";
+      }
+
+      container.onmousedown = () => { isDragging = true; };
+      window.onmouseup = () => { isDragging = false; };
+      window.onmousemove = (e) => { if (isDragging) updateSlider(e.clientX); };
+
+      container.ontouchstart = () => { isDragging = true; };
+      window.ontouchend = () => { isDragging = false; };
+      window.ontouchmove = (e) => { if (isDragging && e.touches[0]) updateSlider(e.touches[0].clientX); };
+    }
+  </script>
+</body>
+</html>
