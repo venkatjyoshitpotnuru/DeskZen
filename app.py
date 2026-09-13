@@ -2,15 +2,15 @@ import base64
 import cv2
 import numpy as np
 import torch
-from flask import Flask, render_template, request, jsonify
 
 # Fix PyTorch 2.6+ unpickling restriction for Ultralytics weights
-try:
-    from ultralytics.nn.tasks import SegmentationModel
-    torch.serialization.add_safe_globals([SegmentationModel])
-except Exception:
-    pass
+_orig_torch_load = torch.load
+def _patched_torch_load(*args, **kwargs):
+    kwargs.setdefault('weights_only', False)
+    return _orig_torch_load(*args, **kwargs)
+torch.load = _patched_torch_load
 
+from flask import Flask, render_template, request, jsonify
 from ultralytics import YOLO
 
 app = Flask(__name__)
