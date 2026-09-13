@@ -1,7 +1,16 @@
 import base64
 import cv2
 import numpy as np
+import torch
 from flask import Flask, render_template, request, jsonify
+
+# Fix PyTorch 2.6+ unpickling restriction for Ultralytics weights
+try:
+    from ultralytics.nn.tasks import SegmentationModel
+    torch.serialization.add_safe_globals([SegmentationModel])
+except Exception:
+    pass
+
 from ultralytics import YOLO
 
 app = Flask(__name__)
@@ -80,32 +89,27 @@ def compute_cognitive_field(image, detections, alpha_overlay=0.55):
 
 def calculate_zen_score(detections, free_surface_ratio, img_height):
     """
-    Precision Zen Score:
+    Physical Zen Score:
     - Anchors directly to free surface ratio (91% -> ~82 base pts).
-    - Tolerates 1-2 work accessories (like a notepad or planner).
-    - Penalizes real clutter (cables, trash, or 3+ loose books/papers).
+    - Tolerates 1-2 standard desk items (like a notebook or planner).
+    - Penalizes real clutter (cables, trash, or 3+ loose documents).
     """
-    # 1. Base points directly from free usable space
     score = float(free_surface_ratio * 90.0)
 
-    # 2. Desk reach zone detections (y > 45% of image height)
+    # Active reach envelope (bottom 55% of frame)
     desk_items = [d for d in detections if d["bbox"][3] > (img_height * 0.45)]
     
-    # Critical clutter (cables, trash)
     harsh_clutter = [d for d in desk_items if d["label"] in ["cable", "wire", "trash"]]
     score -= len(harsh_clutter) * 8.0
 
-    # Loose documents/books: allow up to 2 items (e.g. planner/binder) without penalty
     books_papers = [d for d in desk_items if d["label"] in ["book", "paper"]]
     if len(books_papers) > 2:
         score -= (len(books_papers) - 2) * 7.0
 
-    # Mild single penalty for beverage near input gear
     has_cup = any(d["label"] in ["cup", "bottle"] for d in desk_items)
     if has_cup:
         score -= 3.0
 
-    # Bonus if surface is wide open and free of messy clutter
     if free_surface_ratio >= 0.85 and len(harsh_clutter) == 0 and len(books_papers) <= 2:
         score += 8.0
 

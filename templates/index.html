@@ -42,7 +42,6 @@
       margin: 0 auto;
     }
 
-    /* Top Navigation Bar */
     .nav-bar {
       display: flex;
       justify-content: space-between;
@@ -84,7 +83,6 @@
       border: 1px solid rgba(56, 189, 248, 0.25);
     }
 
-    /* Header Section */
     header {
       text-align: center;
       margin-bottom: 2.5rem;
@@ -106,7 +104,6 @@
       line-height: 1.5;
     }
 
-    /* Layout Grid */
     .main-grid {
       display: grid;
       grid-template-columns: 1fr;
@@ -142,7 +139,6 @@
       color: var(--text-main);
     }
 
-    /* Upload Zone */
     .upload-zone {
       border: 2px dashed rgba(255, 255, 255, 0.12);
       border-radius: 12px;
@@ -169,7 +165,6 @@
       font-size: 1.4rem;
     }
 
-    /* Buttons */
     .btn {
       display: flex;
       align-items: center;
@@ -211,7 +206,6 @@
       box-shadow: none;
     }
 
-    /* Stats Dashboard */
     .stats-row {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
@@ -238,7 +232,6 @@
       margin-top: 0.35rem;
     }
 
-    /* Delta Badge Banner */
     .delta-badge {
       background: rgba(16, 185, 129, 0.08);
       border: 1px solid rgba(16, 185, 129, 0.25);
@@ -256,7 +249,6 @@
       color: var(--accent-emerald);
     }
 
-    /* Visual Tabs Switcher */
     .toggle-container {
       display: flex;
       background: rgba(0, 0, 0, 0.4);
@@ -294,7 +286,6 @@
       object-fit: cover;
     }
 
-    /* Interactive Slider Component */
     .slider-wrapper {
       position: relative;
       width: 100%;
@@ -373,7 +364,6 @@
     .pill-before { left: 12px; background: rgba(244, 63, 94, 0.2); color: #fda4af; border: 1px solid rgba(244, 63, 94, 0.4); }
     .pill-after { right: 12px; background: rgba(16, 185, 129, 0.2); color: #6ee7b7; border: 1px solid rgba(16, 185, 129, 0.4); }
 
-    /* Action Items */
     .action-item {
       background: rgba(255, 255, 255, 0.02);
       border: 1px solid var(--card-border);
@@ -393,7 +383,6 @@
     .action-title { font-weight: 700; font-size: 0.92rem; margin-bottom: 0.25rem; }
     .action-desc { font-size: 0.84rem; color: var(--text-muted); line-height: 1.5; }
 
-    /* Loading state */
     #loadingSpinner {
       display: none;
       text-align: center;
@@ -419,8 +408,6 @@
 </head>
 <body>
   <div class="container">
-    
-    <!-- Top Navigation -->
     <nav class="nav-bar">
       <div class="brand">
         <div class="brand-logo">✨</div>
@@ -429,14 +416,12 @@
       <div class="badge">AI Desk Assistant</div>
     </nav>
 
-    <!-- Header Section -->
     <header>
       <h1>Clean Desk, Clear Mind</h1>
       <p>Upload a photo of your desk to check clutter levels, track open space, and get tips to stay organized.</p>
     </header>
 
     <div class="main-grid">
-      <!-- Input Panel -->
       <div class="card">
         <div class="card-head">
           <h2 id="inputHeading">1. Upload Desk Photo</h2>
@@ -465,14 +450,12 @@
         </div>
       </div>
 
-      <!-- Results Panel -->
       <div id="resultsCard" class="card" style="display: none;">
         <div class="card-head">
           <h2>2. Desk Score & Results</h2>
           <span style="font-size: 0.8rem; color: var(--text-muted);">Live Analysis</span>
         </div>
         
-        <!-- Score Delta Badge -->
         <div id="deltaBadge" class="delta-badge" style="display: none;">
           <div>
             <div id="scoreDelta" class="delta-val">+0 pts</div>
@@ -490,7 +473,6 @@
           </div>
         </div>
 
-        <!-- Metric Boxes -->
         <div class="stats-row">
           <div class="stat-box">
             <div id="zenScore" class="stat-val">--</div>
@@ -506,17 +488,14 @@
           </div>
         </div>
 
-        <!-- Mode Toggles -->
         <div class="toggle-container">
           <button id="tabHeatmap" class="toggle-btn active" onclick="switchView('heatmap')">🔥 Clutter Heatmap</button>
           <button id="tabBoxes" class="toggle-btn" onclick="switchView('boxes')">🎯 Detected Items</button>
           <button id="tabSlider" class="toggle-btn" style="display: none;" onclick="switchView('slider')">↔️ Before vs After</button>
         </div>
 
-        <!-- Single View Image -->
         <img id="displayViewImg" class="view-image" />
 
-        <!-- Before vs After Interactive Wipe Slider -->
         <div id="sliderContainer" class="slider-wrapper" style="display: none;">
           <div class="slider-pill pill-before">Before</div>
           <div class="slider-pill pill-after">After</div>
@@ -531,7 +510,6 @@
           Red and warm spots show where clutter is building up. Cool blue areas show clean, open working space.
         </p>
 
-        <!-- Action Items List -->
         <h3 style="font-size: 0.92rem; font-weight: 700; margin-bottom: 0.85rem; color: var(--text-main);">Quick Things to Fix:</h3>
         <div id="actionList"></div>
       </div>
