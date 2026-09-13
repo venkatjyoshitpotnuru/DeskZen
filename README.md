@@ -25,3 +25,44 @@ DeskZen is an AI-powered computer vision application designed to evaluate, quant
 ---
 
 ## System Architecture
+
+User Desk Photo
+│
+▼
+Flask Backend (app.py)
+│
+├──> Ultralytics YOLO11-Seg (Bounding boxes + Polygon masks)
+│         │
+│         ├──> Pixel-Level Surface Availability Ratio
+│         └──> Clutter Class Penalties
+│
+├──> 2D Gaussian Spatial Friction Field (OpenCV Turbo colormap)
+│
+└──> Physics-Calibrated Scoring Engine
+│
+▼
+Clean JSON Telemetry + Base64 Rendered Overlays
+│
+▼
+Interactive Glassmorphic UI (Before vs. After Comparison Slider)
+
+
+---
+
+## Tech Stack
+
+* **Language:** Python 3.11
+* **Backend:** Flask, Gunicorn
+* **Computer Vision:** Ultralytics YOLO11-Seg, OpenCV (`opencv-python-headless`), NumPy
+* **Deep Learning Framework:** PyTorch 2.5.1 (CPU optimized)
+* **Frontend:** Vanilla HTML5, Modern CSS Glassmorphism, Responsive JavaScript
+* **Cloud Infrastructure:** Render Web Services
+
+---
+
+## Local Development Setup
+
+### 1. Clone the Repository
+```bash
+git clone [https://github.com/venkatjyoshitpotnuru/DeskZen.git](https://github.com/venkatjyoshitpotnuru/DeskZen.git)
+cd DeskZen
