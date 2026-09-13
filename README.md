@@ -66,13 +66,3 @@ Interactive Glassmorphic UI (Before vs. After Comparison Slider)
 ```bash
 git clone [https://github.com/venkatjyoshitpotnuru/DeskZen.git](https://github.com/venkatjyoshitpotnuru/DeskZen.git)
 cd DeskZen
-
-DeskZen/
-├── .gitignore               # Excludes virtual environments and Python cache
-├── .python-version          # Pins Python 3.11.9 for cloud deployment
-├── README.md                # Project documentation
-├── requirements.txt         # Production dependencies
-├── app.py                   # Flask server, segmentation pipeline & scoring engine
-├── yolo11n-seg.pt           # YOLO11-Seg neural network weights
-└── templates/
-    └── index.html           # Single-page UI with Before/After comparison slider
